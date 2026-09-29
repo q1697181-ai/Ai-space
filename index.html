@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Качалка: путь к Ёжику</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="wrap">
+  <div id="hud">
+    <div class="stat">💪 Сила <b id="str">0</b>/100<div class="bar"><i id="strBar"></i></div></div>
+    <div class="stat">⚡ Выносливость <b id="tired"></b><div class="bar"><i id="staBar"></i></div></div>
+    <div class="stat">💰 <b id="money">0</b> $</div>
+    <div class="stat">🏋️ Вес: <span id="wbtns"></span><small id="maxw"></small></div>
+  </div>
+  <canvas id="c" width="960" height="540"></canvas>
+  <div id="msg"></div>
+
+  <div id="select" class="overlay">
+    <h1>КАЧАЛКА</h1>
+    <p>Выбери себя. Второй пацан будет качаться рядом.</p>
+    <div class="cards">
+      <button class="card" onclick="startGame(0)"><img src="face1.jpg" alt=""><span>Пацан 1</span></button>
+      <button class="card" onclick="startGame(1)"><img src="face2.jpg" alt=""><span>Пацан 2</span></button>
+    </div>
+    <p class="small">Стрелки/WASD — ходьба, Shift — бег, E — действие, 1–4 — вес, Пробел — жать в армрестлинге</p>
+  </div>
+
+  <div id="armMenu" class="overlay hidden"></div>
+  <div id="end" class="overlay hidden">
+    <h1>ПОБЕДА!</h1>
+    <p>Ты победил Гиганта-Ёжа и стал легендой качалки!</p>
+    <button class="big" onclick="location.reload()">Играть снова</button>
+  </div>
+
+  <button id="pull" class="hidden">ЖМИ!!!</button>
+  <div id="pad">
+    <button data-k="ArrowLeft">◀</button><button data-k="ArrowUp">▲</button>
+    <button data-k="ArrowDown">▼</button><button data-k="ArrowRight">▶</button>
+    <button data-k="ShiftLeft">БЕГ</button><button data-k="KeyE">E</button>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
