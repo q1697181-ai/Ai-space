@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Симулятор Качка</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui">
+            <div class="stat">💪 Сила: <span id="strength">0</span></div>
+            <div class="stat">💰 Деньги: <span id="money">0</span></div>
+            <div class="stat">⚡ Выносливость: <div class="bar-bg"><div id="stamina-bar" class="bar-fill"></div></div></div>
+            <div id="status-message"></div>
+        </div>
+        <div id="minigame-ui" class="hidden">
+            <h2 id="minigame-title">АРМРЕСТЛИНГ</h2>
+            <p>Быстро жми <b>ПРОБЕЛ</b> (или тапай по экрану) чтобы победить!</p>
+            <div class="tug-bar-bg">
+                <div id="tug-bar-fill"></div>
+            </div>
+            <button id="start-minigame-btn">Начать</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
