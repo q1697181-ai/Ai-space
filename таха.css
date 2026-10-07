@@ -1,0 +1,1354 @@
+/* ============================================================
+   BRAWL STARS КЛОН — ПОЛНЫЙ CSS
+   Красивая графика, анимации, адаптивность
+   ============================================================ */
+
+/* ========== ГЛОБАЛЬНЫЕ СБРОСЫ ========== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* ========== ПЕРЕМЕННЫЕ ========== */
+:root {
+  /* Цвета */
+  --bg-dark: #070a14;
+  --bg-mid: #141a2b;
+  --bg-light: #1b2340;
+  --accent-gold: #f5c542;
+  --accent-gold-dark: #d4a017;
+  --accent-blue: #3b8cff;
+  --accent-blue-light: #6bb3ff;
+  --accent-red: #ff4d5e;
+  --accent-red-light: #ff8a95;
+  --accent-green: #4cd964;
+  --text-primary: #ffffff;
+  --text-secondary: #aab4d4;
+  --text-muted: #666a7a;
+
+  /* Свечения */
+  --glow-blue: 0 0 20px rgba(59, 140, 255, 0.53);
+  --glow-blue-strong: 0 0 40px rgba(59, 140, 255, 0.8);
+  --glow-gold: 0 0 20px rgba(245, 197, 66, 0.53);
+  --glow-gold-strong: 0 0 40px rgba(245, 197, 66, 0.8);
+  --glow-red: 0 0 20px rgba(255, 77, 94, 0.53);
+  --glow-red-strong: 0 0 40px rgba(255, 77, 94, 0.8);
+
+  /* Скругления */
+  --radius-xs: 6px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
+
+  /* Тени */
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 15px 40px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 25px 60px rgba(0, 0, 0, 0.8);
+  --shadow-inset: inset 0 0 100px rgba(59, 140, 255, 0.1);
+
+  /* Шрифты */
+  --font-main: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
+  --font-display: 'Impact', 'Segoe UI Black', 'Arial Black', sans-serif;
+
+  /* Переходы */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* ========== HTML/BODY ========== */
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-dark);
+  font-family: var(--font-main);
+  color: var(--text-primary);
+  touch-action: none;
+  overscroll-behavior: none;
+  position: fixed;
+  inset: 0;
+}
+
+/* ========== КОНТЕЙНЕР ИГРЫ ========== */
+#game-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at 50% 30%, var(--bg-light), var(--bg-dark) 80%);
+  overflow: hidden;
+}
+
+#game-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(59, 140, 255, 0.08), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(255, 77, 94, 0.08), transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#game-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 1200px;
+  max-height: 800px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #0f1424;
+  box-shadow:
+    var(--shadow-xl),
+    var(--shadow-inset),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+}
+
+/* ========== CANVAS ========== */
+#game-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 1;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* ========== ВЕРХНИЙ HUD ========== */
+#hud-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 50;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent);
+}
+
+.hud-team {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.hud-team.right {
+  flex-direction: row-reverse;
+}
+
+/* ========== КАРТОЧКА ИГРОКА ========== */
+.player-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(10, 15, 30, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  padding: 6px 14px 6px 6px;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.player-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  transition: left 0.6s ease;
+}
+
+.player-card:hover::before {
+  left: 100%;
+}
+
+.player-card.right {
+  padding: 6px 6px 6px 14px;
+  flex-direction: row-reverse;
+}
+
+.player-card.dead {
+  opacity: 0.4;
+  filter: grayscale(0.8);
+}
+
+/* ========== АВАТАР ========== */
+.player-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  flex-shrink: 0;
+  border: 2px solid;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  position: relative;
+  box-shadow: 0 0 12px currentColor;
+  transition: transform var(--transition-fast);
+}
+
+.player-avatar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), transparent 60%);
+  pointer-events: none;
+}
+
+/* ========== ИНФО ИГРОКА ========== */
+.player-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  min-width: 80px;
+}
+
+.player-name {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+.player-hp-bar {
+  width: 70px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xs);
+  margin-top: 3px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.player-hp-fill {
+  height: 100%;
+  border-radius: var(--radius-xs);
+  transition: width 0.3s ease, background 0.3s ease;
+  box-shadow: 0 0 8px currentColor;
+  position: relative;
+}
+
+.player-hp-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+  border-radius: inherit;
+}
+
+/* ========== ЦЕНТРАЛЬНЫЙ HUD ========== */
+#center-hud {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 55;
+  pointer-events: none;
+}
+
+#score-display {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(10, 15, 30, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  padding: 8px 28px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+}
+
+#score-display::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(59, 140, 255, 0.5), transparent 40%, transparent 60%, rgba(255, 77, 94, 0.5));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.score-number {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-shadow: 0 0 20px currentColor;
+  min-width: 40px;
+  text-align: center;
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+  transition: transform var(--transition-fast);
+}
+
+.score-number.pop {
+  animation: score-pop 0.4s ease;
+}
+
+@keyframes score-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
+.score-number.blue {
+  color: var(--accent-blue);
+  text-shadow: var(--glow-blue-strong);
+}
+
+.score-number.red {
+  color: var(--accent-red);
+  text-shadow: var(--glow-red-strong);
+}
+
+/* ========== ТАЙМЕР ========== */
+#timer-display {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: rgba(10, 15, 30, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  padding: 4px 24px;
+  box-shadow: var(--shadow-md);
+  letter-spacing: 2px;
+  font-family: var(--font-display);
+  transition: color var(--transition-base);
+  min-width: 100px;
+  text-align: center;
+}
+
+#timer-display.warning {
+  color: var(--accent-red);
+  animation: pulse-timer 0.8s infinite;
+  border-color: rgba(255, 77, 94, 0.4);
+}
+
+@keyframes pulse-timer {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: var(--shadow-md), 0 0 20px rgba(255, 77, 94, 0.3);
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.85;
+    box-shadow: var(--shadow-md), 0 0 40px rgba(255, 77, 94, 0.6);
+  }
+}
+
+/* ========== УВЕДОМЛЕНИЯ О УБИЙСТВАХ ========== */
+#kill-feed {
+  position: absolute;
+  top: 100px;
+  right: 24px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  max-width: 300px;
+}
+
+.kill-feed-item {
+  background: rgba(10, 15, 30, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation:
+    feed-slide-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    feed-fade-out 0.4s ease 2.6s forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+.kill-feed-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--accent-blue), var(--accent-red));
+}
+
+.kill-feed-item .killer {
+  color: var(--accent-blue);
+  font-weight: 700;
+}
+
+.kill-feed-item .victim {
+  color: var(--accent-red);
+  font-weight: 700;
+}
+
+.kill-feed-item .icon {
+  font-size: 18px;
+  filter: drop-shadow(0 0 6px var(--accent-gold));
+}
+
+@keyframes feed-slide-in {
+  from {
+    transform: translateX(120%) scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes feed-fade-out {
+  to {
+    opacity: 0;
+    transform: translateX(120%) scale(0.8);
+  }
+}
+
+/* ========== ДЖОЙСТИК ========== */
+#joystick-zone {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+  height: 45%;
+  z-index: 100;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+#joystick-base {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow:
+    var(--glow-blue),
+    inset 0 0 30px rgba(59, 140, 255, 0.1),
+    0 0 60px rgba(59, 140, 255, 0.15);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  will-change: opacity, left, top;
+}
+
+#joystick-base::before {
+  content: '';
+  position: absolute;
+  inset: 15px;
+  border-radius: inherit;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+#joystick-knob {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle at 35% 35%, var(--accent-blue-light), var(--accent-blue));
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 0 30px rgba(59, 140, 255, 0.67),
+    0 8px 20px rgba(0, 0, 0, 0.5),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  will-change: transform, opacity, left, top;
+}
+
+#joystick-knob::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: inherit;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.5), transparent 60%);
+}
+
+/* ========== КНОПКА СУПЕРСПОСОБНОСТИ ========== */
+#super-button {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-full);
+  z-index: 110;
+  pointer-events: auto;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  color: var(--text-primary);
+  background: radial-gradient(circle at 35% 35%, var(--accent-gold), var(--accent-gold-dark));
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    var(--glow-gold),
+    0 10px 30px rgba(0, 0, 0, 0.6),
+    inset 0 -6px 15px rgba(0, 0, 0, 0.2);
+  transition: all var(--transition-base);
+  user-select: none;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  touch-action: none;
+  overflow: hidden;
+}
+
+#super-button::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: inherit;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+}
+
+#super-button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  border-radius: inherit;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+#super-button:active {
+  transform: scale(0.9);
+  box-shadow:
+    var(--glow-gold-strong),
+    0 5px 15px rgba(0, 0, 0, 0.6);
+}
+
+#super-button.ready {
+  animation: super-pulse 1s infinite;
+}
+
+#super-button.ready::after {
+  animation: super-shine 1.5s infinite;
+}
+
+@keyframes super-pulse {
+  0%, 100% {
+    box-shadow: var(--glow-gold), 0 10px 30px rgba(0, 0, 0, 0.6);
+  }
+  50% {
+    box-shadow: var(--glow-gold-strong), 0 10px 30px rgba(0, 0, 0, 0.6);
+  }
+}
+
+@keyframes super-shine {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.3; }
+}
+
+#super-button.disabled {
+  filter: grayscale(0.8);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ========== КНОПКА АТАКИ ========== */
+#attack-button {
+  position: absolute;
+  bottom: 40px;
+  right: 160px;
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-full);
+  z-index: 110;
+  pointer-events: auto;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  color: var(--text-primary);
+  background: radial-gradient(circle at 35% 35%, #ff6b7a, #cc2233);
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    var(--glow-red),
+    0 8px 25px rgba(0, 0, 0, 0.5),
+    inset 0 -5px 12px rgba(0, 0, 0, 0.2);
+  transition: all var(--transition-fast);
+  user-select: none;
+  touch-action: none;
+  overflow: hidden;
+}
+
+#attack-button::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+}
+
+#attack-button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  border-radius: inherit;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+#attack-button:active {
+  transform: scale(0.88);
+  box-shadow:
+    var(--glow-red-strong),
+    0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* ========== ИНДИКАТОР ПЕРЕЗАРЯДКИ ========== */
+.cooldown-overlay {
+  position: absolute;
+  bottom: 40px;
+  right: 160px;
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-full);
+  background: conic-gradient(
+    rgba(0, 0, 0, 0.7) var(--cooldown, 0%),
+    transparent var(--cooldown, 0%)
+  );
+  pointer-events: none;
+  z-index: 111;
+  transition: --cooldown 0.1s linear;
+  mask: radial-gradient(circle, transparent 55%, black 56%);
+  -webkit-mask: radial-gradient(circle, transparent 55%, black 56%);
+}
+
+@property --cooldown {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+/* ========== ЭКРАН КОНЦА ИГРЫ ========== */
+#game-over-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 8, 18, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-slow);
+}
+
+#game-over-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#game-over-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(245, 197, 66, 0.1), transparent 60%);
+  pointer-events: none;
+  animation: game-over-glow 2s infinite;
+}
+
+@keyframes game-over-glow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+#game-over-title {
+  font-size: 64px;
+  font-weight: 900;
+  color: var(--accent-gold);
+  text-shadow: var(--glow-gold-strong), 0 0 120px rgba(245, 197, 66, 0.27);
+  margin-bottom: 12px;
+  letter-spacing: 4px;
+  font-family: var(--font-display);
+  animation: title-in 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes title-in {
+  from {
+    transform: scale(2) rotate(-10deg);
+    opacity: 0;
+    filter: blur(20px);
+  }
+  to {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+#game-over-subtitle {
+  font-size: 22px;
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+  letter-spacing: 2px;
+  text-align: center;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+  animation: subtitle-in 1s ease 0.3s backwards;
+}
+
+@keyframes subtitle-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== КНОПКА ПЕРЕЗАПУСКА ========== */
+#restart-button {
+  padding: 18px 56px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--bg-dark);
+  background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark));
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  box-shadow:
+    var(--glow-gold),
+    0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: all var(--transition-base);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-main);
+  overflow: hidden;
+  animation: button-in 1s ease 0.5s backwards;
+}
+
+@keyframes button-in {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+#restart-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.6s ease;
+}
+
+#restart-button:hover {
+  transform: scale(1.05);
+  box-shadow:
+    var(--glow-gold-strong),
+    0 12px 35px rgba(0, 0, 0, 0.6);
+}
+
+#restart-button:hover::before {
+  left: 100%;
+}
+
+#restart-button:active {
+  transform: scale(0.97);
+}
+
+/* ========== ЭФФЕКТ УРОНА ========== */
+.damage-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(255, 50, 50, 0.3) 100%);
+  pointer-events: none;
+  z-index: 200;
+  animation: damage-flash-anim 0.3s ease forwards;
+}
+
+@keyframes damage-flash-anim {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* ========== ДОПОЛНИТЕЛЬНЫЕ ЭФФЕКТЫ ========== */
+@keyframes float-up {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.shake {
+  animation: shake 0.3s ease;
+}
+
+/* Пульсация супер-готовности */
+@keyframes glow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(245, 197, 66, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 25px rgba(245, 197, 66, 1));
+  }
+}
+
+/* Вращение */
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Плавное появление */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========== СКРОЛЛБАР (скрыт) ========== */
+::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* ========== ВЫДЕЛЕНИЕ ТЕКСТА ========== */
+::selection {
+  background: var(--accent-blue);
+  color: var(--text-primary);
+}
+
+/* ========== АДАПТИВНОСТЬ ========== */
+
+/* Планшеты */
+@media (max-width: 1024px) {
+  #game-container {
+    border-radius: var(--radius-md);
+  }
+
+  .player-name {
+    max-width: 80px;
+  }
+}
+
+/* Маленькие планшеты */
+@media (max-width: 768px) {
+  #hud-top {
+    padding: 10px 14px;
+  }
+
+  .player-card {
+    padding: 4px 10px 4px 4px;
+    border-radius: var(--radius-xl);
+  }
+
+  .player-card.right {
+    padding: 4px 4px 4px 10px;
+  }
+
+  .player-avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .player-name {
+    font-size: 11px;
+    max-width: 65px;
+  }
+
+  .player-hp-bar {
+    width: 55px;
+    height: 5px;
+  }
+
+  #score-display {
+    padding: 6px 18px;
+    gap: 14px;
+  }
+
+  .score-number {
+    font-size: 24px;
+    min-width: 30px;
+  }
+
+  #timer-display {
+    font-size: 16px;
+    padding: 3px 18px;
+    min-width: 80px;
+  }
+
+  #super-button {
+    width: 80px;
+    height: 80px;
+    font-size: 28px;
+    bottom: 30px;
+    right: 30px;
+  }
+
+  #attack-button {
+    width: 65px;
+    height: 65px;
+    font-size: 24px;
+    bottom: 30px;
+    right: 125px;
+  }
+
+  .cooldown-overlay {
+    width: 65px;
+    height: 65px;
+    bottom: 30px;
+    right: 125px;
+  }
+
+  #joystick-base {
+    width: 110px;
+    height: 110px;
+  }
+
+  #joystick-knob {
+    width: 48px;
+    height: 48px;
+  }
+
+  #game-over-title {
+    font-size: 40px;
+    letter-spacing: 3px;
+  }
+
+  #game-over-subtitle {
+    font-size: 16px;
+    margin-bottom: 30px;
+  }
+
+  #restart-button {
+    padding: 14px 40px;
+    font-size: 18px;
+  }
+
+  #kill-feed {
+    top: 85px;
+    right: 12px;
+    max-width: 240px;
+  }
+
+  .kill-feed-item {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
+
+/* Телефоны */
+@media (max-width: 480px) {
+  #hud-top {
+    padding: 8px 10px;
+  }
+
+  .player-card {
+    padding: 3px 8px 3px 3px;
+    gap: 5px;
+  }
+
+  .player-card.right {
+    padding: 3px 3px 3px 8px;
+  }
+
+  .player-avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+    border-width: 1.5px;
+  }
+
+  .player-name {
+    font-size: 10px;
+    max-width: 55px;
+  }
+
+  .player-hp-bar {
+    width: 45px;
+    height: 4px;
+  }
+
+  #score-display {
+    padding: 5px 14px;
+    gap: 10px;
+  }
+
+  .score-number {
+    font-size: 20px;
+    min-width: 24px;
+  }
+
+  #timer-display {
+    font-size: 14px;
+    padding: 2px 14px;
+    min-width: 65px;
+    letter-spacing: 1px;
+  }
+
+  #super-button {
+    width: 68px;
+    height: 68px;
+    font-size: 24px;
+    bottom: 25px;
+    right: 25px;
+    border-width: 3px;
+  }
+
+  #attack-button {
+    width: 55px;
+    height: 55px;
+    font-size: 20px;
+    bottom: 25px;
+    right: 105px;
+    border-width: 3px;
+  }
+
+  .cooldown-overlay {
+    width: 55px;
+    height: 55px;
+    bottom: 25px;
+    right: 105px;
+  }
+
+  #joystick-base {
+    width: 95px;
+    height: 95px;
+  }
+
+  #joystick-knob {
+    width: 42px;
+    height: 42px;
+  }
+
+  #joystick-knob::after {
+    inset: 6px;
+  }
+
+  #game-over-title {
+    font-size: 32px;
+    letter-spacing: 2px;
+  }
+
+  #game-over-subtitle {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  #restart-button {
+    padding: 12px 32px;
+    font-size: 16px;
+    letter-spacing: 1px;
+  }
+
+  #kill-feed {
+    top: 75px;
+    right: 8px;
+    max-width: 200px;
+    gap: 6px;
+  }
+
+  .kill-feed-item {
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: var(--radius-xs);
+  }
+}
+
+/* Очень маленькие экраны */
+@media (max-width: 360px) {
+  .player-name {
+    display: none;
+  }
+
+  .player-hp-bar {
+    width: 35px;
+  }
+
+  #super-button {
+    width: 60px;
+    height: 60px;
+    font-size: 20px;
+  }
+
+  #attack-button {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+    right: 92px;
+  }
+
+  .cooldown-overlay {
+    width: 48px;
+    height: 48px;
+    right: 92px;
+  }
+}
+
+/* ========== ЛАНДШАФТНАЯ ОРИЕНТАЦИЯ НА ТЕЛЕФОНЕ ========== */
+@media (max-height: 500px) and (orientation: landscape) {
+  #hud-top {
+    padding: 6px 14px;
+  }
+
+  .player-avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+
+  .player-name {
+    font-size: 10px;
+  }
+
+  #center-hud {
+    top: 8px;
+  }
+
+  #score-display {
+    padding: 4px 16px;
+    gap: 12px;
+  }
+
+  .score-number {
+    font-size: 20px;
+  }
+
+  #timer-display {
+    font-size: 14px;
+    padding: 2px 14px;
+  }
+
+  #super-button {
+    width: 65px;
+    height: 65px;
+    font-size: 22px;
+    bottom: 20px;
+    right: 20px;
+  }
+
+  #attack-button {
+    width: 52px;
+    height: 52px;
+    font-size: 20px;
+    bottom: 20px;
+    right: 95px;
+  }
+
+  .cooldown-overlay {
+    width: 52px;
+    height: 52px;
+    bottom: 20px;
+    right: 95px;
+  }
+
+  #joystick-base {
+    width: 90px;
+    height: 90px;
+  }
+
+  #joystick-knob {
+    width: 40px;
+    height: 40px;
+  }
+
+  #kill-feed {
+    top: 60px;
+  }
+}
+
+/* ========== ТЁМНАЯ ТЕМА (по умолчанию) ========== */
+/* Игра уже в тёмной теме, но добавим поддержку */
+
+/* ========== ОТКЛЮЧЕНИЕ АНИМАЦИЙ ДЛЯ ПРЕДПОЧТЕНИЙ ========== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ========== ВЫСОКОКОНТРАСТНЫЙ РЕЖИМ ========== */
+@media (prefers-contrast: high) {
+  .player-card {
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .kill-feed-item {
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  #super-button,
+  #attack-button {
+    border-width: 5px;
+  }
+}
+
+/* ========== ПОДДЕРЖКА HOVER ТОЛЬКО НА УСТРОЙСТВАХ С МЫШЬЮ ========== */
+@media (hover: none) {
+  .player-card:hover::before {
+    left: -100%;
+  }
+
+  #restart-button:hover {
+    transform: none;
+    box-shadow: var(--glow-gold), 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  #restart-button:hover::before {
+    left: -100%;
+  }
+}
+
+/* ========== КАСТОМНЫЙ ФОКУС ДЛЯ ДОСТУПНОСТИ ========== */
+#restart-button:focus-visible {
+  outline: 3px solid var(--accent-gold);
+  outline-offset: 4px;
+}
+
+#super-button:focus-visible,
+#attack-button:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 3px;
+}
+
+/* ========== ПЕЧАТЬ (на всякий случай) ========== */
+@media print {
+  #game-wrapper {
+    display: none;
+  }
+}
+
+/* ========== КОНЕЦ CSS ========== */

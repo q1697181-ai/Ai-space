@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Brawl Stars клон — супер-красивый</title>
+  <style>
+    /* ========== ГЛОБАЛЬНЫЕ СБРОСЫ И ПЕРЕМЕННЫЕ ========== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg-dark: #0b0e1a;
+      --bg-mid: #141a2b;
+      --accent-gold: #f5c542;
+      --accent-blue: #3b8cff;
+      --accent-red: #ff4d5e;
+      --accent-green: #4cd964;
+      --glow-blue: 0 0 20px #3b8cff88;
+      --glow-gold: 0 0 20px #f5c54288;
+      --glow-red: 0 0 20px #ff4d5e88;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --font-main: 'Segoe UI', 'Poppins', system-ui, sans-serif;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-dark);
+      font-family: var(--font-main);
+      touch-action: none;
+    }
+
+    /* ========== КОНТЕЙНЕР ИГРЫ ========== */
+    #game-wrapper {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at 50% 30%, #1b2340, #070a14 80%);
+      overflow: hidden;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 1200px;
+      max-height: 800px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), inset 0 0 100px rgba(59, 140, 255, 0.1);
+      background: #0f1424;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ========== ВЕРХНЯЯ ПАНЕЛЬ (HUD) ========== */
+    #hud-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      z-index: 50;
+      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+    }
+
+    .hud-team {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .hud-team.right {
+      flex-direction: row-reverse;
+    }
+
+    .player-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(10, 15, 30, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 40px;
+      padding: 6px 14px 6px 6px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      transition: all 0.25s ease;
+    }
+
+    .player-card.right {
+      padding: 6px 6px 6px 14px;
+      flex-direction: row-reverse;
+    }
+
+    .player-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+      border: 2px solid;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .player-info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .player-name {
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .player-hp-bar {
+      width: 70px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 3px;
+      margin-top: 3px;
+      overflow: hidden;
+    }
+
+    .player-hp-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    /* ========== ТАЙМЕР И СЧЁТ ========== */
+    #center-hud {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 55;
+      pointer-events: none;
+    }
+
+    #score-display {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: rgba(10, 15, 30, 0.8);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50px;
+      padding: 8px 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .score-number {
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 0 0 20px currentColor;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .score-number.blue {
+      color: #3b8cff;
+      text-shadow: 0 0 20px #3b8cff88;
+    }
+
+    .score-number.red {
+      color: #ff4d5e;
+      text-shadow: 0 0 20px #ff4d5e88;
+    }
+
+    #timer-display {
+      margin-top: 8px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(10, 15, 30, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 30px;
+      padding: 4px 24px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      letter-spacing: 2px;
+    }
+
+    #timer-display.warning {
+      color: #ff4d5e;
+      animation: pulse-timer 0.8s infinite;
+    }
+
+    @keyframes pulse-timer {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.08); opacity: 0.8; }
+    }
+
+    /* ========== ИГРОВОЕ ПОЛЕ ========== */
+    #game-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+    }
+
+    /* ========== ДЖОЙСТИК ========== */
+    #joystick-zone {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50%;
+      height: 45%;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+    }
+
+    #joystick-base {
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 0 30px rgba(59, 140, 255, 0.2), inset 0 0 30px rgba(59, 140, 255, 0.05);
+      transition: opacity 0.2s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #joystick-knob {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #6bb3ff, #3b8cff);
+      border: 3px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 30px #3b8cffaa, 0 8px 20px rgba(0,0,0,0.5);
+      transition: transform 0.05s linear;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    /* ========== КНОПКА СУПЕРСПОСОБНОСТИ ========== */
+    #super-button {
+      position: absolute;
+      bottom: 40px;
+      right: 40px;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      z-index: 110;
+      pointer-events: auto;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      color: #fff;
+      background: radial-gradient(circle at 35% 35%, #f5c542, #d4a017);
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 40px #f5c54266, 0 10px 30px rgba(0,0,0,0.6);
+      transition: all 0.2s ease;
+      user-select: none;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    #super-button:active {
+      transform: scale(0.9);
+      box-shadow: 0 0 60px #f5c542cc, 0 5px 15px rgba(0,0,0,0.6);
+    }
+
+    #super-button.ready {
+      animation: super-pulse 1s infinite;
+    }
+
+    @keyframes super-pulse {
+      0%, 100% { box-shadow: 0 0 40px #f5c54266, 0 10px 30px rgba(0,0,0,0.6); }
+      50% { box-shadow: 0 0 70px #f5c542cc, 0 10px 30px rgba(0,0,0,0.6); }
+    }
+
+    #super-button.disabled {
+      filter: grayscale(0.8);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* ========== КНОПКА АТАКИ ========== */
+    #attack-button {
+      position: absolute;
+      bottom: 40px;
+      right: 160px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      z-index: 110;
+      pointer-events: auto;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      color: #fff;
+      background: radial-gradient(circle at 35% 35%, #ff6b7a, #cc2233);
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 0 30px #ff4d5e66, 0 8px 25px rgba(0,0,0,0.5);
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    #attack-button:active {
+      transform: scale(0.88);
+      box-shadow: 0 0 50px #ff4d5ecc, 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    /* ========== ЭКРАН КОНЦА ИГРЫ ========== */
+    #game-over-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 8, 18, 0.92);
+      backdrop-filter: blur(16px);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    #game-over-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #game-over-title {
+      font-size: 64px;
+      font-weight: 900;
+      color: #f5c542;
+      text-shadow: 0 0 60px #f5c54288, 0 0 120px #f5c54244;
+      margin-bottom: 12px;
+      letter-spacing: 4px;
+      animation: title-in 0.8s ease;
+    }
+
+    @keyframes title-in {
+      from { transform: scale(2); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    #game-over-subtitle {
+      font-size: 22px;
+      color: #aab4d4;
+      margin-bottom: 40px;
+      letter-spacing: 2px;
+    }
+
+    #restart-button {
+      padding: 18px 56px;
+      font-size: 22px;
+      font-weight: 700;
+      color: #0b0e1a;
+      background: linear-gradient(135deg, #f5c542, #f5a623);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 0 40px #f5c54266, 0 10px 30px rgba(0,0,0,0.5);
+      transition: all 0.25s ease;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    #restart-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 60px #f5c542cc, 0 12px 35px rgba(0,0,0,0.6);
+    }
+
+    #restart-button:active {
+      transform: scale(0.97);
+    }
+
+    /* ========== УВЕДОМЛЕНИЯ О УБИЙСТВАХ ========== */
+    #kill-feed {
+      position: absolute;
+      top: 100px;
+      right: 24px;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .kill-feed-item {
+      background: rgba(10, 15, 30, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-sm);
+      padding: 8px 16px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      animation: feed-slide-in 0.4s ease, feed-fade-out 0.4s ease 2.6s forwards;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .kill-feed-item .killer { color: #3b8cff; }
+    .kill-feed-item .victim { color: #ff4d5e; }
+    .kill-feed-item .icon { font-size: 18px; }
+
+    @keyframes feed-slide-in {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes feed-fade-out {
+      to { opacity: 0; transform: translateX(120%); }
+    }
+
+    /* ========== ЭФФЕКТЫ ПОЯВЛЕНИЯ ========== */
+    .damage-flash {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(255, 50, 50, 0.3) 100%);
+      pointer-events: none;
+      z-index: 200;
+      animation: damage-flash-anim 0.3s ease forwards;
+    }
+
+    @keyframes damage-flash-anim {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    /* ========== ИНДИКАТОР ПЕРЕЗАРЯДКИ ========== */
+    .cooldown-overlay {
+      position: absolute;
+      bottom: 40px;
+      right: 160px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: conic-gradient(rgba(0,0,0,0.7) var(--cooldown, 0%), transparent var(--cooldown, 0%));
+      pointer-events: none;
+      z-index: 111;
+      transition: --cooldown 0.1s linear;
+    }
+
+    /* ========== АДАПТИВНОСТЬ ========== */
+    @media (max-width: 768px) {
+      #hud-top { padding: 10px 14px; }
+      .player-card { padding: 4px 10px 4px 4px; border-radius: 30px; }
+      .player-card.right { padding: 4px 4px 4px 10px; }
+      .player-avatar { width: 30px; height: 30px; font-size: 14px; }
+      .player-name { font-size: 11px; }
+      .player-hp-bar { width: 55px; height: 5px; }
+      #score-display { padding: 6px 18px; gap: 14px; }
+      .score-number { font-size: 24px; min-width: 30px; }
+      #timer-display { font-size: 16px; padding: 3px 18px; }
+      #super-button { width: 80px; height: 80px; font-size: 28px; bottom: 30px; right: 30px; }
+      #attack-button { width: 65px; height: 65px; font-size: 24px; bottom: 30px; right: 125px; }
+      .cooldown-overlay { width: 65px; height: 65px; bottom: 30px; right: 125px; }
+      #joystick-base { width: 110px; height: 110px; }
+      #joystick-knob { width: 48px; height: 48px; }
+      #game-over-title { font-size: 40px; }
+      #game-over-subtitle { font-size: 16px; }
+      #restart-button { padding: 14px 40px; font-size: 18px; }
+    }
+
+    @media (max-width: 480px) {
+      #super-button { width: 68px; height: 68px; font-size: 24px; bottom: 25px; right: 25px; }
+      #attack-button { width: 55px; height: 55px; font-size: 20px; bottom: 25px; right: 105px; }
+      .cooldown-overlay { width: 55px; height: 55px; bottom: 25px; right: 105px; }
+      #joystick-base { width: 95px; height: 95px; }
+      #joystick-knob { width: 42px; height: 42px; }
+      .player-name { font-size: 10px; }
+      .player-hp-bar { width: 45px; }
+    }
+
+    /* ========== СКРОЛЛБАР (скрыт) ========== */
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body>
+  <div id="game-wrapper">
+    <div id="game-container">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- HUD ВЕРХНИЙ -->
+      <div id="hud-top">
+        <div class="hud-team" id="team-blue">
+          <div class="player-card">
+            <div class="player-avatar" style="background:#3b8cff; border-color:#3b8cff;">🔵</div>
+            <div class="player-info">
+              <span class="player-name">Ты</span>
+              <div class="player-hp-bar">
+                <div class="player-hp-fill" style="width:100%; background:#3b8cff;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hud-team right" id="team-red">
+          <div class="player-card right">
+            <div class="player-info" style="align-items:flex-end;">
+              <span class="player-name">Враг 1</span>
+              <div class="player-hp-bar">
+                <div class="player-hp-fill" style="width:100%; background:#ff4d5e;"></div>
+              </div>
+            </div>
+            <div class="player-avatar" style="background:#ff4d5e; border-color:#ff4d5e;">🔴</div>
+          </div>
+          <div class="player-card right">
+            <div class="player-info" style="align-items:flex-end;">
+              <span class="player-name">Враг 2</span>
+              <div class="player-hp-bar">
+                <div class="player-hp-fill" style="width:100%; background:#ff4d5e;"></div>
+              </div>
+            </div>
+            <div class="player-avatar" style="background:#ff4d5e; border-color:#ff4d5e;">🔴</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ЦЕНТР HUD -->
+      <div id="center-hud">
+        <div id="score-display">
+          <span class="score-number blue" id="score-blue">0</span>
+          <span style="color:#666; font-size:24px;">⚔️</span>
+          <span class="score-number red" id="score-red">0</span>
+        </div>
+        <div id="timer-display">2:30</div>
+      </div>
+
+      <!-- УВЕДОМЛЕНИЯ -->
+      <div id="kill-feed"></div>
+
+      <!-- ДЖОЙСТИК -->
+      <div id="joystick-zone">
+        <div id="joystick-base"></div>
+        <div id="joystick-knob"></div>
+      </div>
+
+      <!-- КНОПКИ -->
+      <div id="attack-button">⚔️</div>
+      <div class="cooldown-overlay" id="attack-cooldown"></div>
+      <div id="super-button" class="disabled">💥</div>
+
+      <!-- ЭКРАН КОНЦА ИГРЫ -->
+      <div id="game-over-overlay">
+        <div id="game-over-title">ПОБЕДА</div>
+        <div id="game-over-subtitle">Синяя команда доминирует</div>
+        <button id="restart-button">Играть снова</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // 1. КОНФИГУРАЦИЯ И КОНСТАНТЫ
+    // ============================================================
+    const CONFIG = {
+      MAP_WIDTH: 2000,
+      MAP_HEIGHT: 2000,
+      TILE_SIZE: 100,
+      PLAYER_RADIUS: 28,
+      PLAYER_SPEED: 5.2,
+      PROJECTILE_SPEED: 11,
+      PROJECTILE_RADIUS: 10,
+      PROJECTILE_DAMAGE: 22,
+      PROJECTILE_LIFETIME: 55,
+      ATTACK_COOLDOWN: 28,
+      SUPER_COOLDOWN: 240,
+      SUPER_DAMAGE: 60,
+      SUPER_RADIUS: 160,
+      MAX_HP: 120,
+      ENEMY_COUNT: 2,
+      ENEMY_SPEED: 3.6,
+      ENEMY_ATTACK_COOLDOWN: 55,
+      ENEMY_PROJECTILE_DAMAGE: 16,
+      ENEMY_DETECTION_RANGE: 600,
+      RESPAWN_TIME: 180,
+      MATCH_DURATION: 150,
+      KILL_SCORE: 1,
+    };
+
+    // ============================================================
+    // 2. СОСТОЯНИЕ ИГРЫ
+    // ============================================================
+    const state = {
+      running: true,
+      paused: false,
+      gameOver: false,
+      winner: null,
+      timer: CONFIG.MATCH_DURATION,
+      scoreBlue: 0,
+      scoreRed: 0,
+      frame: 0,
+      entities: [],
+      projectiles: [],
+      particles: [],
+      damageNumbers: [],
+      walls: [],
+      obstacles: [],
+      camera: { x: 0, y: 0, targetX: 0, targetY: 0 },
+      input: {
+        joystickActive: false,
+        joystickAngle: 0,
+        joystickIntensity: 0,
+        attackPressed: false,
+        superPressed: false,
+        touchStart: { x: 0, y: 0 },
+        keys: {},
+      },
+      player: null,
+      enemies: [],
+      effects: [],
+    };
+
+    // ============================================================
+    // 3. УТИЛИТЫ
+    // ============================================================
+    const Utils = {
+      dist(x1, y1, x2, y2) {
+        const dx = x2 - x1, dy = y2 - y1;
+        return Math.sqrt(dx * dx + dy * dy);
+      },
+      angle(x1, y1, x2, y2) {
+        return Math.atan2(y2 - y1, x2 - x1);
+      },
+      clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      },
+      lerp(a, b, t) {
+        return a + (b - a) * t;
+      },
+      rand(min, max) {
+        return Math.random() * (max - min) + min;
+      },
+      randInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      },
+      circleCollision(x1, y1, r1, x2, y2, r2) {
+        return Utils.dist(x1, y1, x2, y2) < r1 + r2;
+      },
+      pointInRect(px, py, rx, ry, rw, rh) {
+        return px > rx && px < rx + rw && py > ry && py < ry + rh;
+      },
+      circleRectCollision(cx, cy, cr, rx, ry, rw, rh) {
+        const closestX = Utils.clamp(cx, rx, rx + rw);
+        const closestY = Utils.clamp(cy, ry, ry + rh);
+        return Utils.dist(cx, cy, closestX, closestY) < cr;
+      },
+      formatTime(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = Math.floor(seconds % 60);
+        return `${m}:${s.toString().padStart(2, '0')}`;
+      },
+    };
+
+    // ============================================================
+    // 4. КЛАСС ИГРОКА
+    // ============================================================
+    class Player {
+      constructor(x, y, team, isBot = false) {
+        this.x = x;
+        this.y = y;
+        this.team = team;
+        this.isBot = isBot;
+        this.radius = CONFIG.PLAYER_RADIUS;
+        this.hp = CONFIG.MAX_HP;
+        this.maxHp = CONFIG.MAX_HP;
+        this.speed = isBot ? CONFIG.ENEMY_SPEED : CONFIG.PLAYER_SPEED;
+        this.alive = true;
+        this.respawnTimer = 0;
+        this.attackCooldown = 0;
+        this.superCooldown = 0;
+        this.superReady = false;
+        this.kills = 0;
+        this.deaths = 0;
+        this.angle = 0;
+        this.targetAngle = 0;
+        this.moving = false;
+        this.hitFlash = 0;
+        this.spawnX = x;
+        this.spawnY = y;
+        this.name = isBot ? `Враг ${Math.random() > 0.5 ? '1' : '2'}` : 'Ты';
+      }
+
+      update(dt, input) {
+        if (!this.alive) {
+          this.respawnTimer -= dt;
+          if (this.respawnTimer <= 0) {
+            this.respawn();
+          }
+          return;
+        }
+
+        // Движение
+        let moveX = 0, moveY = 0;
+
+        if (!this.isBot) {
+          // Управление игрока
+          if (input.joystickActive) {
+            moveX = Math.cos(input.joystickAngle) * input.joystickIntensity;
+            moveY = Math.sin(input.joystickAngle) * input.joystickIntensity;
+          }
+          if (input.keys['w'] || input.keys['arrowup']) moveY -= 1;
+          if (input.keys['s'] || input.keys['arrowdown']) moveY += 1;
+          if (input.keys['a'] || input.keys['arrowleft']) moveX -= 1;
+          if (input.keys['d'] || input.keys['arrowright']) moveX += 1;
+        } else {
+          // ИИ бота
+          const target = this.findTarget();
+          if (target) {
+            const dist = Utils.dist(this.x, this.y, target.x, target.y);
+            const angle = Utils.angle(this.x, this.y, target.x, target.y);
+            this.targetAngle = angle;
+            if (dist > 280) {
+              moveX = Math.cos(angle);
+              moveY = Math.sin(angle);
+            } else if (dist < 180) {
+              moveX = -Math.cos(angle) * 0.5;
+              moveY = -Math.sin(angle) * 0.5;
+            } else {
+              // Стрейф
+              moveX = Math.cos(angle + Math.PI / 2) * 0.6;
+              moveY = Math.sin(angle + Math.PI / 2) * 0.6;
+            }
+
+            // Атака
+            if (dist < CONFIG.ENEMY_DETECTION_RANGE && this.attackCooldown <= 0) {
+              this.shoot(angle);
+              this.attackCooldown = CONFIG.ENEMY_ATTACK_COOLDOWN;
+            }
+          }
+        }
+
+        // Нормализация
+        const mag = Math.sqrt(moveX * moveX + moveY * moveY);
+        if (mag > 0) {
+          moveX /= mag;
+          moveY /= mag;
+          this.moving = true;
+          if (!this.isBot) {
+            this.targetAngle = Math.atan2(moveY, moveX);
+          }
+        } else {
+          this.moving = false;
+        }
+
+        // Применение движения с коллизиями
+        const newX = this.x + moveX * this.speed * dt;
+        const newY = this.y + moveY * this.speed * dt;
+        this.tryMove(newX, newY);
+
+        // Плавный поворот
+        if (!this.isBot && this.moving) {
+          let diff = this.targetAngle - this.angle;
+          while (diff > Math.PI) diff -= Math.PI * 2;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          this.angle += diff * 0.2 * dt;
+        } else if (this.isBot) {
+          let diff = this.targetAngle - this.angle;
+          while (diff > Math.PI) diff -= Math.PI * 2;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          this.angle += diff * 0.15 * dt;
+        }
+
+        // Кулдауны
+        if (this.attackCooldown > 0) this.attackCooldown -= dt;
+        if (this.superCooldown > 0) {
+          this.superCooldown -= dt;
+          if (this.superCooldown <= 0) {
+            this.superReady = true;
+          }
+        }
+        if (this.hitFlash > 0) this.hitFlash -= dt;
+
+        // Границы карты
+        this.x = Utils.clamp(this.x, this.radius, CONFIG.MAP_WIDTH - this.radius);
+        this.y = Utils.clamp(this.y, this.radius, CONFIG.MAP_HEIGHT - this.radius);
+      }
+
+      tryMove(newX, newY) {
+        // Проверка стен
+        let canMoveX = true, canMoveY = true;
+
+        for (const wall of state.walls) {
+          if (Utils.circleRectCollision(newX, this.y, this.radius, wall.x, wall.y, wall.w, wall.h)) {
+            canMoveX = false;
+          }
+          if (Utils.circleRectCollision(this.x, newY, this.radius, wall.x, wall.y, wall.w, wall.h)) {
+            canMoveY = false;
+          }
+        }
+
+        if (canMoveX) this.x = newX;
+        if (canMoveY) this.y = newY;
+      }
+
+      findTarget() {
+        // Ищем ближайшего врага
+        let closest = null;
+        let closestDist = Infinity;
+
+        for (const entity of state.entities) {
+          if (entity === this || entity.team === this.team || !entity.alive) continue;
+          const dist = Utils.dist(this.x, this.y, entity.x, entity.y);
+          if (dist < closestDist) {
+            closestDist = dist;
+            closest = entity;
+          }
+        }
+        return closest;
+      }
+
+      shoot(angle) {
+        if (!this.alive) return;
+        const proj = new Projectile(
+          this.x + Math.cos(angle) * (this.radius + 8),
+          this.y + Math.sin(angle) * (this.radius + 8),
+          angle,
+          this.isBot ? CONFIG.ENEMY_PROJECTILE_DAMAGE : CONFIG.PROJECTILE_DAMAGE,
+          this.team,
+          this
+        );
+        state.projectiles.push(proj);
+
+        // Частицы выстрела
+        for (let i = 0; i < 6; i++) {
+          state.particles.push(new Particle(
+            this.x + Math.cos(angle) * this.radius,
+            this.y + Math.sin(angle) * this.radius,
+            Utils.rand(-2, 2) + Math.cos(angle) * 3,
+            Utils.rand(-2, 2) + Math.sin(angle) * 3,
+            this.team === 'blue' ? '#3b8cff' : '#ff4d5e',
+            Utils.rand(4, 8),
+            Utils.rand(10, 20)
+          ));
+        }
+      }
+
+      useSuper() {
+        if (!this.superReady || !this.alive) return;
+        this.superReady = false;
+        this.superCooldown = CONFIG.SUPER_COOLDOWN;
+
+        // Взрыв вокруг игрока
+        const superRadius = CONFIG.SUPER_RADIUS;
+
+        for (const entity of state.entities) {
+          if (entity === this || entity.team === this.team || !entity.alive) continue;
+          const dist = Utils.dist(this.x, this.y, entity.x, entity.y);
+          if (dist < superRadius) {
+            entity.takeDamage(CONFIG.SUPER_DAMAGE, this);
+          }
+        }
+
+        // Визуальный эффект
+        state.effects.push({
+          type: 'superExplosion',
+          x: this.x,
+          y: this.y,
+          radius: 0,
+          maxRadius: superRadius,
+          alpha: 1,
+          life: 30,
+          maxLife: 30,
+        });
+
+        // Частицы
+        for (let i = 0; i < 40; i++) {
+          const a = Utils.rand(0, Math.PI * 2);
+          const spd = Utils.rand(3, 10);
+          state.particles.push(new Particle(
+            this.x, this.y,
+            Math.cos(a) * spd,
+            Math.sin(a) * spd,
+            '#f5c542',
+            Utils.rand(6, 14),
+            Utils.rand(20, 40)
+          ));
+        }
+      }
+
+      takeDamage(amount, source) {
+        if (!this.alive || this.hitFlash > 0.1) return;
+        this.hp -= amount;
+        this.hitFlash = 0.2;
+
+        // Частицы урона
+        for (let i = 0; i < 8; i++) {
+          const a = Utils.rand(0, Math.PI * 2);
+          state.particles.push(new Particle(
+            this.x, this.y,
+            Math.cos(a) * Utils.rand(2, 5),
+            Math.sin(a) * Utils.rand(2, 5),
+            '#ff4d5e',
+            Utils.rand(4, 8),
+            Utils.rand(15, 25)
+          ));
+        }
+
+        // Цифра урона
+        state.damageNumbers.push({
+          x: this.x,
+          y: this.y - 20,
+          value: Math.round(amount),
+          life: 40,
+          maxLife: 40,
+          color: source && source.team === 'blue' ? '#3b8cff' : '#ff4d5e',
+        });
+
+        if (this.hp <= 0) {
+          this.die(source);
+        }
+      }
+
+      die(killer) {
+        this.alive = false;
+        this.hp = 0;
+        this.deaths++;
+        this.respawnTimer = CONFIG.RESPAWN_TIME;
+
+        if (killer) {
+          killer.kills++;
+          if (killer.team === 'blue') {
+            state.scoreBlue += CONFIG.KILL_SCORE;
+          } else {
+            state.scoreRed += CONFIG.KILL_SCORE;
+          }
+          // Уведомление
+          addKillFeed(killer.name || 'Игрок', this.name || 'Враг');
+        }
+
+        // Эффект смерти
+        for (let i = 0; i < 25; i++) {
+          const a = Utils.rand(0, Math.PI * 2);
+          const spd = Utils.rand(2, 8);
+          state.particles.push(new Particle(
+            this.x, this.y,
+            Math.cos(a) * spd,
+            Math.sin(a) * spd,
+            this.team === 'blue' ? '#3b8cff' : '#ff4d5e',
+            Utils.rand(6, 12),
+            Utils.rand(25, 50)
+          ));
+        }
+
+        state.effects.push({
+          type: 'deathExplosion',
+          x: this.x,
+          y: this.y,
+          radius: 0,
+          maxRadius: 80,
+          alpha: 1,
+          life: 25,
+          maxLife: 25,
+        });
+      }
+
+      respawn() {
+        this.alive = true;
+        this.hp = this.maxHp;
+        this.x = this.spawnX;
+        this.y = this.spawnY;
+        this.hitFlash = 0;
+        this.attackCooldown = 0;
+
+        // Эффект респавна
+        for (let i = 0; i < 15; i++) {
+          const a = Utils.rand(0, Math.PI * 2);
+          state.particles.push(new Particle(
+            this.x, this.y,
+            Math.cos(a) * Utils.rand(1, 4),
+            Math.sin(a) * Utils.rand(1, 4),
+            '#ffffff',
+            Utils.rand(3, 7),
+            Utils.rand(20, 40)
+          ));
+        }
+      }
+    }
+
+    // ============================================================
+    // 5. КЛАСС СНАРЯДА
+    // ============================================================
+    class Projectile {
+      constructor(x, y, angle, damage, team, owner) {
+        this.x = x;
+        this.y = y;
+        this.startX = x;
+        this.startY = y;
+        this.vx = Math.cos(angle) * CONFIG.PROJECTILE_SPEED;
+        this.vy = Math.sin(angle) * CONFIG.PROJECTILE_SPEED;
+        this.radius = CONFIG.PROJECTILE_RADIUS;
+        this.damage = damage;
+        this.team = team;
+        this.owner = owner;
+        this.life = CONFIG.PROJECTILE_LIFETIME;
+        this.alive = true;
+        this.angle = angle;
+        this.trail = [];
+      }
+
+      update() {
+        if (!this.alive) return;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.life--;
+
+        // Трейл
+        this.trail.push({ x: this.x, y: this.y, life: 8 });
+        if (this.trail.length > 8) this.trail.shift();
+
+        // Границы
+        if (this.x < 0 || this.x > CONFIG.MAP_WIDTH || this.y < 0 || this.y > CONFIG.MAP_HEIGHT) {
+          this.alive = false;
+          return;
+        }
+
+        if (this.life <= 0) {
+          this.alive = false;
+          return;
+        }
+
+        // Коллизии со стенами
+        for (const wall of state.walls) {
+          if (Utils.circleRectCollision(this.x, this.y, this.radius, wall.x, wall.y, wall.w, wall.h)) {
+            this.alive = false;
+            this.explode();
+            return;
+          }
+        }
+
+        // Коллизии с сущностями
+        for (const entity of state.entities) {
+          if (!entity.alive || entity === this.owner || entity.team === this.team) continue;
+          if (Utils.circleCollision(this.x, this.y, this.radius, entity.x, entity.y, entity.radius)) {
+            entity.takeDamage(this.damage, this.owner);
+            this.alive = false;
+            this.explode();
+            return;
+          }
+        }
+      }
+
+      explode() {
+        for (let i = 0; i < 8; i++) {
+          const a = Utils.rand(0, Math.PI * 2);
+          state.particles.push(new Particle(
+            this.x, this.y,
+            Math.cos(a) * Utils.rand(1, 4),
+            Math.sin(a) * Utils.rand(1, 4),
+            this.team === 'blue' ? '#3b8cff' : '#ff4d5e',
+            Utils.rand(3, 6),
+            Utils.rand(10, 20)
+          ));
+        }
+      }
+    }
+
+    // ============================================================
+    // 6. ЧАСТИЦЫ
+    // ============================================================
+    class Particle {
+      constructor(x, y, vx, vy, color, size, life) {
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.color = color;
+        this.size = size;
+        this.life = life;
+        this.maxLife = life;
+        this.alive = true;
+      }
+
+      update() {
+        if (!this.alive) return;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx *= 0.97;
+        this.vy *= 0.97;
+        this.life--;
+        if (this.life <= 0) this.alive = false;
+      }
+    }
+
+    // ============================================================
+    // 7. ГЕНЕРАЦИЯ КАРТЫ
+    // ============================================================
+    function generateMap() {
+      state.walls = [];
+
+      const W = CONFIG.MAP_WIDTH;
+      const H = CONFIG.MAP_HEIGHT;
+      const T = 120;
+
+      // Внешние стены
+      state.walls.push({ x: 0, y: 0, w: W, h: 40 });
+      state.walls.push({ x: 0, y: H - 40, w: W, h: 40 });
+      state.walls.push({ x: 0, y: 0, w: 40, h: H });
+      state.walls.push({ x: W - 40, y: 0, w: 40, h: H });
+
+      // Симметричные препятствия
+      const centerX = W / 2;
+      const centerY = H / 2;
+
+      // Центральный крест
+      state.walls.push({ x: centerX - 200, y: centerY - 30, w: 400, h: 60 });
+      state.walls.push({ x: centerX - 30, y: centerY - 200, w: 60, h: 400 });
+
+      // Угловые блоки
+      state.walls.push({ x: 200, y: 200, w: T, h: T });
+      state.walls.push({ x: W - 200 - T, y: 200, w: T, h: T });
+      state.walls.push({ x: 200, y: H - 200 - T, w: T, h: T });
+      state.walls.push({ x: W - 200 - T, y: H - 200 - T, w: T, h: T });
+
+      // Боковые стены
+      state.walls.push({ x: 400, y: 400, w: T, h: 60 });
+      state.walls.push({ x: W - 400 - T, y: 400, w: T, h: 60 });
+      state.walls.push({ x: 400, y: H - 400 - 60, w: T, h: 60 });
+      state.walls.push({ x: W - 400 - T, y: H - 400 - 60, w: T, h: 60 });
+
+      // Диагональные барьеры
+      state.walls.push({ x: 600, y: 600, w: 200, h: 40 });
+      state.walls.push({ x: W - 800, y: 600, w: 200, h: 40 });
+      state.walls.push({ x: 600, y: H - 640, w: 200, h: 40 });
+      state.walls.push({ x: W - 800, y: H - 640, w: 200, h: 40 });
+
+      // Случайные блоки для интереса
+      for (let i = 0; i < 8; i++) {
+        const x = Utils.rand(300, W - 300);
+        const y = Utils.rand(300, H - 300);
+        // Не ставим слишком близко к центру
+        if (Utils.dist(x, y, centerX, centerY) < 350) continue;
+        state.walls.push({ x: x, y: y, w: 60, h: 60 });
+      }
+
+      // Кусты (просто декорации)
+      state.obstacles = [];
+      for (let i = 0; i < 20; i++) {
+        state.obstacles.push({
+          x: Utils.rand(100, W - 100),
+          y: Utils.rand(100, H - 100),
+          r: Utils.rand(15, 30),
+          type: 'bush',
+        });
+      }
+    }
+
+    // ============================================================
+    // 8. СОЗДАНИЕ СУЩНОСТЕЙ
+    // ============================================================
+    function createEntities() {
+      state.entities = [];
+      state.player = null;
+      state.enemies = [];
+
+      // Игрок (синяя команда, слева)
+      const player = new Player(300, CONFIG.MAP_HEIGHT / 2, 'blue', false);
+      player.name = 'Ты';
+      state.player = player;
+      state.entities.push(player);
+
+      // Враги (красная команда, справа)
+      for (let i = 0; i < CONFIG.ENEMY_COUNT; i++) {
+        const y = CONFIG.MAP_HEIGHT / 2 + (i === 0 ? -200 : 200);
+        const enemy = new Player(CONFIG.MAP_WIDTH - 300, y, 'red', true);
+        enemy.name = `Враг ${i + 1}`;
+        state.enemies.push(enemy);
+        state.entities.push(enemy);
+      }
+    }
+
+    // ============================================================
+    // 9. УВЕДОМЛЕНИЯ
+    // ============================================================
+    function addKillFeed(killerName, victimName) {
+      const feed = document.getElementById('kill-feed');
+      const item = document.createElement('div');
+      item.className = 'kill-feed-item';
+      item.innerHTML = `
+        <span class="icon">⚔️</span>
+        <span class="killer">${killerName}</span>
+        <span style="color:#666;">убил</span>
+        <span class="victim">${victimName}</span>
+      `;
+      feed.appendChild(item);
+      setTimeout(() => {
+        if (item.parentNode) item.remove();
+      }, 3200);
+    }
+
+    // ============================================================
+    // 10. ОБНОВЛЕНИЕ ИГРЫ
+    // ============================================================
+    function updateGame(dt) {
+      if (!state.running || state.gameOver) return;
+
+      state.frame++;
+
+      // Таймер
+      if (state.frame % 60 === 0) {
+        state.timer--;
+        if (state.timer <= 0) {
+          state.timer = 0;
+          endGame();
+        }
+        updateTimerDisplay();
+      }
+
+      // Обновление игрока
+      if (state.player) {
+        state.player.update(dt, state.input);
+      }
+
+      // Обновление врагов
+      for (const enemy of state.enemies) {
+        enemy.update(dt, state.input);
+      }
+
+      // Обновление снарядов
+      for (let i = state.projectiles.length - 1; i >= 0; i--) {
+        const proj = state.projectiles[i];
+        proj.update();
+        if (!proj.alive) {
+          state.projectiles.splice(i, 1);
+        }
+      }
+
+      // Обновление частиц
+      for (let i = state.particles.length - 1; i >= 0; i--) {
+        const p = state.particles[i];
+        p.update();
+        if (!p.alive) {
+          state.particles.splice(i, 1);
+        }
+      }
+
+      // Обновление цифр урона
+      for (let i = state.damageNumbers.length - 1; i >= 0; i--) {
+        const dn = state.damageNumbers[i];
+        dn.life--;
+        dn.y -= 1.2;
+        if (dn.life <= 0) {
+          state.damageNumbers.splice(i, 1);
+        }
+      }
+
+      // Обновление эффектов
+      for (let i = state.effects.length - 1; i >= 0; i--) {
+        const ef = state.effects[i];
+        ef.life--;
+        if (ef.type === 'superExplosion') {
+          ef.radius = Utils.lerp(ef.radius, ef.maxRadius, 0.12);
+          ef.alpha = ef.life / ef.maxLife;
+        } else if (ef.type === 'deathExplosion') {
+          ef.radius = Utils.lerp(ef.radius, ef.maxRadius, 0.15);
+          ef.alpha = ef.life / ef.maxLife;
+        }
+        if (ef.life <= 0) {
+          state.effects.splice(i, 1);
+        }
+      }
+
+      // Проверка конца игры
+      if (state.scoreBlue >= 10 || state.scoreRed >= 10) {
+        endGame();
+      }
+
+      // Обновление камеры
+      updateCamera();
+
+      // Обновление UI
+      updateUI();
+    }
+
+    // ============================================================
+    // 11. ОБНОВЛЕНИЕ КАМЕРЫ
+    // ============================================================
+    function updateCamera() {
+      if (!state.player) return;
+      const targetX = state.player.x - canvas.width / 2;
+      const targetY = state.player.y - canvas.height / 2;
+      state.camera.x = Utils.lerp(state.camera.x, targetX, 0.08);
+      state.camera.y = Utils.lerp(state.camera.y, targetY, 0.08);
+
+      // Границы камеры
+      state.camera.x = Utils.clamp(state.camera.x, 0, CONFIG.MAP_WIDTH - canvas.width);
+      state.camera.y = Utils.clamp(state.camera.y, 0, CONFIG.MAP_HEIGHT - canvas.height);
+    }
+
+    // ============================================================
+    // 12. ОБНОВЛЕНИЕ UI
+    // ============================================================
+    function updateUI() {
+      // Очки
+      document.getElementById('score-blue').textContent = state.scoreBlue;
+      document.getElementById('score-red').textContent = state.scoreRed;
+
+      // HP полоски
+      const blueHpBar = document.querySelector('#team-blue .player-hp-fill');
+      if (blueHpBar && state.player) {
+        blueHpBar.style.width = `${(state.player.hp / state.player.maxHp) * 100}%`;
+        blueHpBar.style.background = state.player.hp > 50 ? '#3b8cff' : state.player.hp > 25 ? '#f5c542' : '#ff4d5e';
+      }
+
+      // HP врагов
+      const redCards = document.querySelectorAll('#team-red .player-card');
+      state.enemies.forEach((enemy, i) => {
+        if (redCards[i]) {
+          const fill = redCards[i].querySelector('.player-hp-fill');
+          if (fill) {
+            fill.style.width = `${(enemy.hp / enemy.maxHp) * 100}%`;
+            fill.style.background = enemy.hp > 50 ? '#ff4d5e' : enemy.hp > 25 ? '#f5c542' : '#ff4d5e';
+          }
+        }
+      });
+
+      // Кнопка супер
+      const superBtn = document.getElementById('super-button');
+      if (state.player) {
+        if (state.player.superReady) {
+          superBtn.classList.remove('disabled');
+          superBtn.classList.add('ready');
+        } else {
+          superBtn.classList.add('disabled');
+          superBtn.classList.remove('ready');
+        }
+      }
+
+      // Кулдаун атаки
+      const cooldownOverlay = document.getElementById('attack-cooldown');
+      if (state.player && state.player.attackCooldown > 0) {
+        const percent = (state.player.attackCooldown / CONFIG.ATTACK_COOLDOWN) * 100;
+        cooldownOverlay.style.setProperty('--cooldown', `${percent}%`);
+      } else {
+        cooldownOverlay.style.setProperty('--cooldown', '0%');
+      }
+    }
+
+    // ============================================================
+    // 13. ТАЙМЕР
+    // ============================================================
+    function updateTimerDisplay() {
+      const timerEl = document.getElementById('timer-display');
+      timerEl.textContent = Utils.formatTime(state.timer);
+      if (state.timer <= 30) {
+        timerEl.classList.add('warning');
+      } else {
+        timerEl.classList.remove('warning');
+      }
+    }
+
+    // ============================================================
+    // 14. КОНЕЦ ИГРЫ
+    // ============================================================
+    function endGame() {
+      state.gameOver = true;
+      state.running = false;
+      state.winner = state.scoreBlue > state.scoreRed ? 'blue' : state.scoreRed > state.scoreBlue ? 'red' : 'draw';
+
+      const overlay = document.getElementById('game-over-overlay');
+      const title = document.getElementById('game-over-title');
+      const subtitle = document.getElementById('game-over-subtitle');
+
+      if (state.winner === 'blue') {
+        title.textContent = 'ПОБЕДА';
+        title.style.color = '#3b8cff';
+        title.style.textShadow = '0 0 60px #3b8cff88, 0 0 120px #3b8cff44';
+        subtitle.textContent = 'Синяя команда доминирует!';
+      } else if (state.winner === 'red') {
+        title.textContent = 'ПОРАЖЕНИЕ';
+        title.style.color = '#ff4d5e';
+        title.style.textShadow = '0 0 60px #ff4d5e88, 0 0 120px #ff4d5e44';
+        subtitle.textContent = 'Красная команда победила...';
+      } else {
+        title.textContent = 'НИЧЬЯ';
+        title.style.color = '#f5c542';
+        title.style.textShadow = '0 0 60px #f5c54288, 0 0 120px #f5c54244';
+        subtitle.textContent = 'Равная битва!';
+      }
+
+      overlay.classList.add('visible');
+    }
+
+    // ============================================================
+    // 15. ПЕРЕЗАПУСК
+    // ============================================================
+    function restartGame() {
+      // Сброс состояния
+      state.running = true;
+      state.paused = false;
+      state.gameOver = false;
+      state.winner = null;
+      state.timer = CONFIG.MATCH_DURATION;
+      state.scoreBlue = 0;
+      state.scoreRed = 0;
+      state.frame = 0;
+      state.projectiles = [];
+      state.particles = [];
+      state.damageNumbers = [];
+      state.effects = [];
+      state.camera = { x: 0, y: 0, targetX: 0, targetY: 0 };
+
+      // Сброс UI
+      document.getElementById('game-over-overlay').classList.remove('visible');
+      document.getElementById('kill-feed').innerHTML = '';
+      document.getElementById('timer-display').classList.remove('warning');
+      updateTimerDisplay();
+
+      // Создание сущностей
+      createEntities();
+      generateMap();
+
+      // Сброс джойстика
+      state.input.joystickActive = false;
+      state.input.joystickAngle = 0;
+      state.input.joystickIntensity = 0;
+      state.input.attackPressed = false;
+      state.input.superPressed = false;
+
+      const base = document.getElementById('joystick-base');
+      const knob = document.getElementById('joystick-knob');
+      base.style.opacity = '0';
+      knob.style.opacity = '0';
+      knob.style.transform = 'translate(0px, 0px)';
+    }
+
+    // ============================================================
+    // 16. РЕНДЕРИНГ
+    // ============================================================
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      const container = document.getElementById('game-container');
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+    }
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+    });
+
+    function render() {
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Очистка
+      ctx.clearRect(0, 0, w, h);
+
+      // Фон
+      const gradient = ctx.createRadialGradient(w / 2, h / 2, 100, w / 2, h / 2, w);
+      gradient.addColorStop(0, '#1b2340');
+      gradient.addColorStop(0.6, '#111827');
+      gradient.addColorStop(1, '#070a14');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, w, h);
+
+      // Сетка
+      ctx.strokeStyle = 'rgba(59, 140, 255, 0.05)';
+      ctx.lineWidth = 1;
+      const gridSize = 100;
+      const offsetX = -state.camera.x % gridSize;
+      const offsetY = -state.camera.y % gridSize;
+      for (let x = offsetX; x < w; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+      }
+      for (let y = offsetY; y < h; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+
+      // Сохраняем контекст для камеры
+      ctx.save();
+      ctx.translate(-state.camera.x, -state.camera.y);
+
+      // Стены
+      for (const wall of state.walls) {
+        // Тень
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.fillRect(wall.x + 4, wall.y + 4, wall.w, wall.h);
+
+        // Основной блок
+        const wallGrad = ctx.createLinearGradient(wall.x, wall.y, wall.x + wall.w, wall.y + wall.h);
+        wallGrad.addColorStop(0, '#2a3450');
+        wallGrad.addColorStop(0.5, '#1e2840');
+        wallGrad.addColorStop(1, '#151d30');
+        ctx.fillStyle = wallGrad;
+        ctx.fillRect(wall.x, wall.y, wall.w, wall.h);
+
+        // Обводка
+        ctx.strokeStyle = 'rgba(59, 140, 255, 0.2)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(wall.x, wall.y, wall.w, wall.h);
+
+        // Блик
+        ctx.fillStyle = 'rgba(255,255,255,0.03)';
+        ctx.fillRect(wall.x, wall.y, wall.w, 8);
+      }
+
+      // Кусты
+      for (const obs of state.obstacles) {
+        if (obs.type === 'bush') {
+          ctx.fillStyle = 'rgba(76, 217, 100, 0.15)';
+          ctx.beginPath();
+          ctx.arc(obs.x, obs.y, obs.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(76, 217, 100, 0.3)';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+      }
+
+      // Частицы
+      for (const p of state.particles) {
+        const alpha = p.life / p.maxLife;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      // Снаряды
+      for (const proj of state.projectiles) {
+        // Трейл
+        for (let i = 0; i < proj.trail.length; i++) {
+          const t = proj.trail[i];
+          const alpha = (i / proj.trail.length) * 0.4;
+          ctx.globalAlpha = alpha;
+          ctx.fillStyle = proj.team === 'blue' ? '#3b8cff' : '#ff4d5e';
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, proj.radius * (i / proj.trail.length) * 0.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        // Снаряд
+        const projGrad = ctx.createRadialGradient(proj.x, proj.y, 0, proj.x, proj.y, proj.radius * 1.5);
+        projGrad.addColorStop(0, '#ffffff');
+        projGrad.addColorStop(0.4, proj.team === 'blue' ? '#6bb3ff' : '#ff6b7a');
+        projGrad.addColorStop(1, proj.team === 'blue' ? '#3b8cff' : '#ff4d5e');
+        ctx.fillStyle = projGrad;
+        ctx.shadowColor = proj.team === 'blue' ? '#3b8cff' : '#ff4d5e';
+        ctx.shadowBlur = 20;
+        ctx.beginPath();
+        ctx.arc(proj.x, proj.y, proj.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      // Сущности
+      for (const entity of state.entities) {
+        if (!entity.alive) continue;
+        drawEntity(entity);
+      }
+
+      // Эффекты
+      for (const ef of state.effects) {
+        ctx.globalAlpha = ef.alpha;
+        if (ef.type === 'superExplosion') {
+          ctx.strokeStyle = '#f5c542';
+          ctx.lineWidth = 4;
+          ctx.shadowColor = '#f5c542';
+          ctx.shadowBlur = 30;
+          ctx.beginPath();
+          ctx.arc(ef.x, ef.y, ef.radius, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        } else if (ef.type === 'deathExplosion') {
+          ctx.strokeStyle = '#ff4d5e';
+          ctx.lineWidth = 3;
+          ctx.shadowColor = '#ff4d5e';
+          ctx.shadowBlur = 20;
+          ctx.beginPath();
+          ctx.arc(ef.x, ef.y, ef.radius, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+      }
+      ctx.globalAlpha = 1;
+
+      // Цифры урона
+      for (const dn of state.damageNumbers) {
+        const alpha = dn.life / dn.maxLife;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = dn.color;
+        ctx.font = 'bold 22px "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        ctx.shadowBlur = 8;
+        ctx.fillText(dn.value, dn.x, dn.y);
+        ctx.shadowBlur = 0;
+      }
+      ctx.globalAlpha = 1;
+
+      ctx.restore();
+    }
+
+    function drawEntity(entity) {
+      const x = entity.x;
+      const y = entity.y;
+      const r = entity.radius;
+
+      // Тень
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.beginPath();
+      ctx.ellipse(x, y + r * 0.8, r * 1.1, r * 0.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Пульсация при hitFlash
+      if (entity.hitFlash > 0) {
+        ctx.shadowColor = '#ffffff';
+        ctx.shadowBlur = 30;
+      }
+
+      // Тело
+      const bodyGrad = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.2, x, y, r);
+      if (entity.team === 'blue') {
+        bodyGrad.addColorStop(0, '#8ec5ff');
+        bodyGrad.addColorStop(0.6, '#3b8cff');
+        bodyGrad.addColorStop(1, '#1e5bb8');
+      } else {
+        bodyGrad.addColorStop(0, '#ff8a95');
+        bodyGrad.addColorStop(0.6, '#ff4d5e');
+        bodyGrad.addColorStop(1, '#b81e2e');
+      }
+      ctx.fillStyle = bodyGrad;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Обводка
+      ctx.strokeStyle = entity.team === 'blue' ? '#6bb3ff' : '#ff8a95';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Внутренний круг
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      ctx.beginPath();
+      ctx.arc(x - r * 0.2, y - r * 0.2, r * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ствол
+      const gunX = x + Math.cos(entity.angle) * (r + 6);
+      const gunY = y + Math.sin(entity.angle) * (r + 6);
+      ctx.strokeStyle = entity.team === 'blue' ? '#6bb3ff' : '#ff8a95';
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x + Math.cos(entity.angle) * r * 0.5, y + Math.sin(entity.angle) * r * 0.5);
+      ctx.lineTo(gunX, gunY);
+      ctx.stroke();
+
+      // Глаз
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(x + Math.cos(entity.angle) * r * 0.3 - r * 0.15, y + Math.sin(entity.angle) * r * 0.3 - r * 0.15, r * 0.18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#0b0e1a';
+      ctx.beginPath();
+      ctx.arc(x + Math.cos(entity.angle) * r * 0.35 - r * 0.15, y + Math.sin(entity.angle) * r * 0.35 - r * 0.15, r * 0.09, 0, Math.PI * 2);
+      ctx.fill();
+
+      // HP бар над головой
+      const barW = 50;
+      const barH = 6;
+      const barX = x - barW / 2;
+      const barY = y - r - 16;
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.beginPath();
+      ctx.roundRect(barX - 1, barY - 1, barW + 2, barH + 2, 4);
+      ctx.fill();
+
+      const hpPercent = entity.hp / entity.maxHp;
+      const hpColor = hpPercent > 0.5 ? (entity.team === 'blue' ? '#3b8cff' : '#ff4d5e') : hpPercent > 0.25 ? '#f5c542' : '#ff4d5e';
+      ctx.fillStyle = hpColor;
+      ctx.beginPath();
+      ctx.roundRect(barX, barY, barW * hpPercent, barH, 3);
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+    }
+
+    // Полифилл roundRect
+    if (!CanvasRenderingContext2D.prototype.roundRect) {
+      CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+        if (w < 2 * r) r = w / 2;
+        if (h < 2 * r) r = h / 2;
+        this.moveTo(x + r, y);
+        this.arcTo(x + w, y, x + w, y + h, r);
+        this.arcTo(x + w, y + h, x, y + h, r);
+        this.arcTo(x, y + h, x, y, r);
+        this.arcTo(x, y, x + w, y, r);
+        this.closePath();
+        return this;
+      };
+    }
+
+    // ============================================================
+    // 17. ВВОД (ДЖОЙСТИК + КНОПКИ)
+    // ============================================================
+    const joystickZone = document.getElementById('joystick-zone');
+    const joystickBase = document.getElementById('joystick-base');
+    const joystickKnob = document.getElementById('joystick-knob');
+    const superBtn = document.getElementById('super-button');
+    const attackBtn = document.getElementById('attack-button');
+
+    let joystickTouchId = null;
+    let joystickCenterX = 0;
+    let joystickCenterY = 0;
+
+    function getTouchPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const touch = e.touches ? e.touches[0] : e;
+      return {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top,
+      };
+    }
+
+    function handleJoystickStart(e) {
+      e.preventDefault();
+      const touch = e.touches ? e.touches[0] : e;
+      const rect = joystickZone.getBoundingClientRect();
+
+      // Центр джойстика в месте касания
+      joystickCenterX = touch.clientX - rect.left;
+      joystickCenterY = touch.clientY - rect.top;
+
+      joystickBase.style.left = joystickCenterX - 70 + 'px';
+      joystickBase.style.top = joystickCenterY - 70 + 'px';
+      joystickBase.style.opacity = '1';
+      joystickKnob.style.left = joystickCenterX - 30 + 'px';
+      joystickKnob.style.top = joystickCenterY - 30 + 'px';
+      joystickKnob.style.opacity = '1';
+
+      state.input.joystickActive = true;
+      state.input.joystickAngle = 0;
+      state.input.joystickIntensity = 0;
+
+      if (e.touches) {
+        joystickTouchId = e.touches[0].identifier;
+      }
+    }
+
+    function handleJoystickMove(e) {
+      if (!state.input.joystickActive) return;
+      e.preventDefault();
+
+      let touch = null;
+      if (e.touches && joystickTouchId !== null) {
+        for (let i = 0; i < e.touches.length; i++) {
+          if (e.touches[i].identifier === joystickTouchId) {
+            touch = e.touches[i];
+            break;
+          }
+        }
+      } else {
+        touch = e;
+      }
+      if (!touch) return;
+
+      const rect = joystickZone.getBoundingClientRect();
+      const dx = (touch.clientX - rect.left) - joystickCenterX;
+      const dy = (touch.clientY - rect.top) - joystickCenterY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const maxDist = 70;
+      const clampedDist = Math.min(dist, maxDist);
+
+      if (dist > 0) {
+        const angle = Math.atan2(dy, dx);
+        const intensity = clampedDist / maxDist;
+        state.input.joystickAngle = angle;
+        state.input.joystickIntensity = intensity;
+
+        const knobX = Math.cos(angle) * clampedDist;
+        const knobY = Math.sin(angle) * clampedDist;
+        joystickKnob.style.transform = `translate(${knobX}px, ${knobY}px)`;
+      }
+    }
+
+    function handleJoystickEnd(e) {
+      if (e && e.changedTouches && joystickTouchId !== null) {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          if (e.changedTouches[i].identifier === joystickTouchId) {
+            joystickTouchId = null;
+            break;
+          }
+        }
+      } else {
+        joystickTouchId = null;
+      }
+
+      state.input.joystickActive = false;
+      state.input.joystickAngle = 0;
+      state.input.joystickIntensity = 0;
+      joystickBase.style.opacity = '0';
+      joystickKnob.style.opacity = '0';
+      joystickKnob.style.transform = 'translate(0px, 0px)';
+    }
+
+    // Обработчики джойстика
+    joystickZone.addEventListener('touchstart', handleJoystickStart, { passive: false });
+    joystickZone.addEventListener('touchmove', handleJoystickMove, { passive: false });
+    joystickZone.addEventListener('touchend', handleJoystickEnd);
+    joystickZone.addEventListener('touchcancel', handleJoystickEnd);
+
+    joystickZone.addEventListener('mousedown', handleJoystickStart);
+    window.addEventListener('mousemove', handleJoystickMove);
+    window.addEventListener('mouseup', handleJoystickEnd);
+
+    // Кнопка супер
+    superBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (state.player && state.player.superReady && state.player.alive) {
+        state.player.useSuper();
+      }
+    }, { passive: false });
+
+    superBtn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      if (state.player && state.player.superReady && state.player.alive) {
+        state.player.useSuper();
+      }
+    });
+
+    // Кнопка атаки
+    attackBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (state.player && state.player.alive && state.player.attackCooldown <= 0) {
+        state.player.shoot(state.player.angle);
+        state.player.attackCooldown = CONFIG.ATTACK_COOLDOWN;
+      }
+    }, { passive: false });
+
+    attackBtn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      if (state.player && state.player.alive && state.player.attackCooldown <= 0) {
+        state.player.shoot(state.player.angle);
+        state.player.attackCooldown = CONFIG.ATTACK_COOLDOWN;
+      }
+    });
+
+    // Клавиатура
+    window.addEventListener('keydown', (e) => {
+      state.input.keys[e.key.toLowerCase()] = true;
+
+      if (e.key === ' ' && state.player && state.player.alive && state.player.attackCooldown <= 0) {
+        state.player.shoot(state.player.angle);
+        state.player.attackCooldown = CONFIG.ATTACK_COOLDOWN;
+      }
+      if (e.key === 'q' && state.player && state.player.superReady && state.player.alive) {
+        state.player.useSuper();
+      }
+      if (e.key === 'r' && state.gameOver) {
+        restartGame();
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      state.input.keys[e.key.toLowerCase()] = false;
+    });
+
+    // Перезапуск
+    document.getElementById('restart-button').addEventListener('click', restartGame);
+
+    // ============================================================
+    // 18. ИНИЦИАЛИЗАЦИЯ
+    // ============================================================
+    function init() {
+      resizeCanvas();
+      generateMap();
+      createEntities();
+      updateTimerDisplay();
+
+      // Стартовый отсчёт
+      console.log('🎮 Brawl Stars клон запущен!');
+      console.log('Управление: джойстик слева, кнопки справа');
+      console.log('Клавиатура: WASD — движение, Space — атака, Q — супер');
+    }
+
+    // ============================================================
+    // 19. ИГРОВОЙ ЦИКЛ
+    // ============================================================
+    let lastTime = performance.now();
+
+    function gameLoop(currentTime) {
+      const dt = Math.min((currentTime - lastTime) / 16.67, 3);
+      lastTime = currentTime;
+
+      if (state.running && !state.gameOver) {
+        updateGame(dt);
+      }
+      render();
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // ============================================================
+    // 20. ЗАПУСК
+    // ============================================================
+    init();
+    requestAnimationFrame(gameLoop);
+
+    // ============================================================
+    // 21. ДОПОЛНИТЕЛЬНЫЕ ЭФФЕКТЫ
+    // ============================================================
+
+    // Мигание экрана при получении урона
+    const originalTakeDamage = Player.prototype.takeDamage;
+    Player.prototype.takeDamage = function(amount, source) {
+      originalTakeDamage.call(this, amount, source);
+      if (this === state.player && this.hitFlash > 0.1) {
+        const flash = document.createElement('div');
+        flash.className = 'damage-flash';
+        document.getElementById('game-container').appendChild(flash);
+        setTimeout(() => flash.remove(), 300);
+      }
+    };
+
+    // ============================================================
+    // 22. ФИНАЛЬНАЯ КОНСОЛЬ
+    // ============================================================
+    console.log('%c⚔️ BRAWL STARS КЛОН ⚔️', 'font-size: 24px; font-weight: bold; color: #f5c542; text-shadow: 0 0 20px #f5c54288;');
+    console.log('%cИграй и наслаждайся!', 'font-size: 16px; color: #3b8cff;');
+    console.log('%cУправление: джойстик, кнопки, WASD, Space, Q', 'font-size: 14px; color: #aab4d4;');
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
